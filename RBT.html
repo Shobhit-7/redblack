@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red-Black Tree Visualizer</title>
+    <style>
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-black: rgba(0, 0, 0, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-border: rgba(94, 82, 64, 0.2);
+            --color-btn-primary-text: var(--color-cream-50);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-text);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--color-gray-300);
+            font-size: 14px;
+        }
+
+        .main-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-panel {
+            background: var(--color-surface);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--color-border);
+        }
+
+        .control-panel h2 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: var(--color-primary);
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        input:focus {
+            outline: 2px solid var(--color-primary);
+            outline-offset: -1px;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 150ms ease;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: rgba(94, 82, 64, 0.12);
+            color: var(--color-text);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(94, 82, 64, 0.2);
+        }
+
+        .btn-full {
+            grid-column: 1 / -1;
+        }
+
+        .info-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .info-section h3 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--color-text);
+        }
+
+        .rule {
+            font-size: 12px;
+            margin-bottom: 8px;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .rule:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--color-primary);
+        }
+
+        .canvas-wrapper {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .output-section {
+            background: var(--color-surface);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--color-border);
+        }
+
+        .output-section h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--color-primary);
+        }
+
+        .steps {
+            font-size: 12px;
+            line-height: 1.6;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .step-item {
+            margin-bottom: 8px;
+            padding: 8px;
+            background: rgba(94, 82, 64, 0.06);
+            border-radius: 4px;
+            border-left: 3px solid var(--color-primary);
+        }
+
+        .step-num {
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .tree-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .stat-box {
+            padding: 10px;
+            background: rgba(94, 82, 64, 0.06);
+            border-radius: 4px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .stat-label {
+            color: var(--color-gray-300);
+            font-size: 11px;
+        }
+
+        @media (max-width: 768px) {
+            .main-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌳 Red-Black Tree Visualizer</h1>
+            <p class="subtitle">Interactive insertion and deletion with step-by-step explanations</p>
+        </header>
+
+        <div class="main-wrapper">
+            <div class="control-panel">
+                <h2>Controls</h2>
+                
+                <div class="form-group">
+                    <label for="insertInput">Insert Value:</label>
+                    <div class="button-group">
+                        <input type="number" id="insertInput" placeholder="Enter number" min="1" max="999">
+                        <button class="btn-primary" onclick="insertNode()">Insert</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="deleteInput">Delete Value:</label>
+                    <div class="button-group">
+                        <input type="number" id="deleteInput" placeholder="Enter number" min="1" max="999">
+                        <button class="btn-primary" onclick="deleteNode()">Delete</button>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="clearTree()">Clear Tree</button>
+                    <button class="btn-secondary" onclick="randomInsert()">Random Node</button>
+                </div>
+
+                <button class="btn-primary btn-full" onclick="loadExample()">Load Example Tree</button>
+
+                <div class="info-section">
+                    <h3>Red-Black Tree Properties:</h3>
+                    <div class="rule">Root is always BLACK</div>
+                    <div class="rule">No two RED nodes adjacent</div>
+                    <div class="rule">Every path has same BLACK count</div>
+                    <div class="rule">All NIL nodes are BLACK</div>
+                </div>
+
+                <div class="tree-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="nodeCount">0</div>
+                        <div class="stat-label">Nodes</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="treeHeight">0</div>
+                        <div class="stat-label">Height</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="canvas-wrapper">
+                <canvas id="treeCanvas"></canvas>
+            </div>
+        </div>
+
+        <div class="output-section">
+            <h3>📋 Operation Steps & Explanation</h3>
+            <div class="steps" id="stepsOutput">
+                <div class="step-item">
+                    <span class="step-num">Step 1:</span> Insert or delete values to see how Red-Black Tree maintains balance
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class RBNode {
+            constructor(value) {
+                this.value = value;
+                this.color = 'RED';
+                this.left = null;
+                this.right = null;
+                this.parent = null;
+            }
+        }
+
+        class RedBlackTree {
+            constructor() {
+                this.root = null;
+                this.steps = [];
+            }
+
+            insert(value) {
+                this.steps = [];
+                this.steps.push(`<span class="step-num">Step 1:</span> Create new RED node with value ${value}`);
+
+                if (this.root === null) {
+                    this.root = new RBNode(value);
+                    this.root.color = 'BLACK';
+                    this.steps.push(`<span class="step-num">Step 2:</span> Tree is empty, set as root and color BLACK`);
+                    return;
+                }
+
+                let current = this.root;
+                let parent = null;
+
+                // Find insertion position using BST logic
+                while (current !== null) {
+                    parent = current;
+                    if (value < current.value) {
+                        current = current.left;
+                    } else if (value > current.value) {
+                        current = current.right;
+                    } else {
+                        this.steps.push(`<span class="step-num">Step 2:</span> Value already exists`);
+                        return; // Duplicate, don't insert
+                    }
+                }
+
+                const newNode = new RBNode(value);
+                newNode.parent = parent;
+
+                if (value < parent.value) {
+                    parent.left = newNode;
+                    this.steps.push(`<span class="step-num">Step 2:</span> Insert as LEFT child of ${parent.value}`);
+                } else {
+                    parent.right = newNode;
+                    this.steps.push(`<span class="step-num">Step 2:</span> Insert as RIGHT child of ${parent.value}`);
+                }
+
+                this.fixInsert(newNode);
+            }
+
+            fixInsert(node) {
+                this.steps.push(`<span class="step-num">Step 3:</span> Fix violations starting from node ${node.value}`);
+                
+                while (node.parent && node.parent.color === 'RED') {
+                    if (node.parent === node.parent.parent.left) {
+                        const uncle = node.parent.parent.right;
+
+                        if (uncle && uncle.color === 'RED') {
+                            // Case 1: Uncle is RED - Recolor
+                            this.steps.push(`<span class="step-num">Step 4:</span> Uncle is RED - Recoloring case`);
+                            this.steps.push(`<span class="step-num">Step 5:</span> Color parent & uncle BLACK, grandparent RED`);
+                            node.parent.color = 'BLACK';
+                            uncle.color = 'BLACK';
+                            node.parent.parent.color = 'RED';
+                            node = node.parent.parent;
+                        } else {
+                            // Case 2: Uncle is BLACK - Rotation needed
+                            if (node === node.parent.right) {
+                                this.steps.push(`<span class="step-num">Step 4:</span> Uncle is BLACK, node is RIGHT child`);
+                                this.steps.push(`<span class="step-num">Step 5:</span> Left rotate parent`);
+                                node = node.parent;
+                                this.rotateLeft(node);
+                            }
+                            this.steps.push(`<span class="step-num">Step 6:</span> Color parent BLACK, grandparent RED`);
+                            this.steps.push(`<span class="step-num">Step 7:</span> Right rotate grandparent`);
+                            node.parent.color = 'BLACK';
+                            node.parent.parent.color = 'RED';
+                            this.rotateRight(node.parent.parent);
+                        }
+                    } else {
+                        const uncle = node.parent.parent.left;
+
+                        if (uncle && uncle.color === 'RED') {
+                            this.steps.push(`<span class="step-num">Step 4:</span> Uncle is RED - Recoloring case`);
+                            this.steps.push(`<span class="step-num">Step 5:</span> Color parent & uncle BLACK, grandparent RED`);
+                            node.parent.color = 'BLACK';
+                            uncle.color = 'BLACK';
+                            node.parent.parent.color = 'RED';
+                            node = node.parent.parent;
+                        } else {
+                            if (node === node.parent.left) {
+                                this.steps.push(`<span class="step-num">Step 4:</span> Uncle is BLACK, node is LEFT child`);
+                                this.steps.push(`<span class="step-num">Step 5:</span> Right rotate parent`);
+                                node = node.parent;
+                                this.rotateRight(node);
+                            }
+                            this.steps.push(`<span class="step-num">Step 6:</span> Color parent BLACK, grandparent RED`);
+                            this.steps.push(`<span class="step-num">Step 7:</span> Left rotate grandparent`);
+                            node.parent.color = 'BLACK';
+                            node.parent.parent.color = 'RED';
+                            this.rotateLeft(node.parent.parent);
+                        }
+                    }
+                }
+                this.root.color = 'BLACK';
+                this.steps.push(`<span class="step-num">Step 8:</span> Ensure root is BLACK`);
+            }
+
+            rotateLeft(node) {
+                if (!node.right) return;
+                const rightChild = node.right;
+                node.right = rightChild.left;
+
+                if (rightChild.left) {
+                    rightChild.left.parent = node;
+                }
+
+                rightChild.parent = node.parent;
+                if (!node.parent) {
+                    this.root = rightChild;
+                } else if (node === node.parent.left) {
+                    node.parent.left = rightChild;
+                } else {
+                    node.parent.right = rightChild;
+                }
+
+                rightChild.left = node;
+                node.parent = rightChild;
+            }
+
+            rotateRight(node) {
+                if (!node.left) return;
+                const leftChild = node.left;
+                node.left = leftChild.right;
+
+                if (leftChild.right) {
+                    leftChild.right.parent = node;
+                }
+
+                leftChild.parent = node.parent;
+                if (!node.parent) {
+                    this.root = leftChild;
+                } else if (node === node.parent.right) {
+                    node.parent.right = leftChild;
+                } else {
+                    node.parent.left = leftChild;
+                }
+
+                leftChild.right = node;
+                node.parent = leftChild;
+            }
+
+            delete(value) {
+                this.steps = [];
+                this.steps.push(`<span class="step-num">Step 1:</span> Search for node with value ${value}`);
+                
+                let nodeToDelete = this.searchNode(this.root, value);
+                if (!nodeToDelete) {
+                    this.steps.push(`<span class="step-num">Step 2:</span> Node not found`);
+                    return;
+                }
+
+                this.steps.push(`<span class="step-num">Step 2:</span> Node found, begin deletion process`);
+                this.deleteNode(nodeToDelete);
+            }
+
+            deleteNode(node) {
+                let nodeToFix, nodeToFixParent;
+
+                // Case 1: Node has two children
+                if (node.left && node.right) {
+                    this.steps.push(`<span class="step-num">Step 3:</span> Node has two children, find successor`);
+                    let successor = this.findMin(node.right);
+                    this.steps.push(`<span class="step-num">Step 4:</span> Replace with successor ${successor.value}`);
+                    node.value = successor.value;
+                    node = successor;
+                }
+
+                // Case 2: Node has at most one child
+                const child = node.left ? node.left : node.right;
+
+                if (node === this.root) {
+                    this.root = child;
+                    if (this.root) this.root.color = 'BLACK';
+                    this.steps.push(`<span class="step-num">Step 5:</span> Node was root, child becomes root`);
+                    return;
+                }
+
+                if (child) {
+                    child.parent = node.parent;
+                }
+
+                if (node.parent.left === node) {
+                    node.parent.left = child;
+                } else {
+                    node.parent.right = child;
+                }
+
+                if (node.color === 'BLACK') {
+                    this.steps.push(`<span class="step-num">Step 5:</span> Deleted BLACK node, fixing violations`);
+                    if (child) {
+                        this.fixDelete(child);
+                    } else {
+                        this.fixDelete(node.parent);
+                    }
+                } else {
+                    this.steps.push(`<span class="step-num">Step 5:</span> Deleted RED node, no fixes needed`);
+                }
+            }
+
+            fixDelete(node) {
+                while (node !== this.root && this.getColor(node) === 'BLACK') {
+                    if (node.parent.left === node) {
+                        const sibling = node.parent.right;
+
+                        if (this.getColor(sibling) === 'RED') {
+                            this.steps.push(`<span class="step-num">Step 6:</span> Sibling is RED, recolor and rotate`);
+                            sibling.color = 'BLACK';
+                            node.parent.color = 'RED';
+                            this.rotateLeft(node.parent);
+                        }
+
+                        if (this.getColor(sibling.left) === 'BLACK' && this.getColor(sibling.right) === 'BLACK') {
+                            this.steps.push(`<span class="step-num">Step 7:</span> Sibling's children are BLACK, recolor sibling`);
+                            sibling.color = 'RED';
+                            node = node.parent;
+                        } else if (this.getColor(sibling.right) === 'BLACK') {
+                            this.steps.push(`<span class="step-num">Step 8:</span> Right child BLACK, rotate sibling`);
+                            sibling.left.color = 'BLACK';
+                            sibling.color = 'RED';
+                            this.rotateRight(sibling);
+                        } else {
+                            this.steps.push(`<span class="step-num">Step 9:</span> Final adjustment with rotations`);
+                            sibling.color = node.parent.color;
+                            node.parent.color = 'BLACK';
+                            sibling.right.color = 'BLACK';
+                            this.rotateLeft(node.parent);
+                            node = this.root;
+                        }
+                    } else {
+                        const sibling = node.parent.left;
+
+                        if (this.getColor(sibling) === 'RED') {
+                            sibling.color = 'BLACK';
+                            node.parent.color = 'RED';
+                            this.rotateRight(node.parent);
+                        }
+
+                        if (this.getColor(sibling.right) === 'BLACK' && this.getColor(sibling.left) === 'BLACK') {
+                            sibling.color = 'RED';
+                            node = node.parent;
+                        } else if (this.getColor(sibling.left) === 'BLACK') {
+                            sibling.right.color = 'BLACK';
+                            sibling.color = 'RED';
+                            this.rotateLeft(sibling);
+                        } else {
+                            sibling.color = node.parent.color;
+                            node.parent.color = 'BLACK';
+                            sibling.left.color = 'BLACK';
+                            this.rotateRight(node.parent);
+                            node = this.root;
+                        }
+                    }
+                }
+                node.color = 'BLACK';
+            }
+
+            getColor(node) {
+                return node ? node.color : 'BLACK';
+            }
+
+            searchNode(node, value) {
+                if (!node) return null;
+                if (value === node.value) return node;
+                if (value < node.value) return this.searchNode(node.left, value);
+                return this.searchNode(node.right, value);
+            }
+
+            findMin(node) {
+                while (node.left) node = node.left;
+                return node;
+            }
+
+            getHeight(node = this.root) {
+                if (!node) return 0;
+                return 1 + Math.max(this.getHeight(node.left), this.getHeight(node.right));
+            }
+
+            getNodeCount(node = this.root) {
+                if (!node) return 0;
+                return 1 + this.getNodeCount(node.left) + this.getNodeCount(node.right);
+            }
+        }
+
+        const tree = new RedBlackTree();
+        const canvas = document.getElementById('treeCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            const wrapper = canvas.parentElement;
+            canvas.width = wrapper.clientWidth - 40;
+            canvas.height = 500;
+        }
+
+        function drawTree() {
+            resizeCanvas();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (!tree.root) {
+                ctx.font = '14px sans-serif';
+                ctx.fillStyle = '#aaa';
+                ctx.textAlign = 'center';
+                ctx.fillText('Tree is empty. Insert a value to begin.', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+
+            drawNode(tree.root, canvas.width / 2, 30, canvas.width / 4);
+            updateStats();
+        }
+
+        function drawNode(node, x, y, offset) {
+            if (!node) return;
+
+            const radius = 20;
+
+            // Draw edges first
+            if (node.left) {
+                ctx.strokeStyle = '#999';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x - offset, y + 70);
+                ctx.stroke();
+                drawNode(node.left, x - offset, y + 70, offset / 2);
+            }
+
+            if (node.right) {
+                ctx.strokeStyle = '#999';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + offset, y + 70);
+                ctx.stroke();
+                drawNode(node.right, x + offset, y + 70, offset / 2);
+            }
+
+            // Draw node circle
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            ctx.fillStyle = node.color === 'RED' ? '#c01527' : '#000';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw value text
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(node.value, x, y);
+        }
+
+        function insertNode() {
+            const input = document.getElementById('insertInput');
+            const value = parseInt(input.value);
+            if (isNaN(value) || value < 1 || value > 999) {
+                alert('Please enter a valid number between 1 and 999');
+                return;
+            }
+            tree.insert(value);
+            input.value = '';
+            drawTree();
+            updateSteps();
+        }
+
+        function deleteNode() {
+            const input = document.getElementById('deleteInput');
+            const value = parseInt(input.value);
+            if (isNaN(value)) {
+                alert('Please enter a valid number');
+                return;
+            }
+            tree.delete(value);
+            input.value = '';
+            drawTree();
+            updateSteps();
+        }
+
+        function clearTree() {
+            tree.root = null;
+            tree.steps = [];
+            drawTree();
+            updateSteps();
+        }
+
+        function randomInsert() {
+            const value = Math.floor(Math.random() * 100) + 1;
+            tree.insert(value);
+            drawTree();
+            updateSteps();
+        }
+
+        function loadExample() {
+            tree.root = null;
+            const values = [50, 25, 75, 10, 30, 60, 80, 5, 15, 27, 35];
+            for (const val of values) {
+                tree.insert(val);
+            }
+            drawTree();
+            tree.steps = ['Example tree loaded with values: 50, 25, 75, 10, 30, 60, 80, 5, 15, 27, 35'];
+            updateSteps();
+        }
+
+        function updateStats() {
+            document.getElementById('nodeCount').textContent = tree.getNodeCount();
+            document.getElementById('treeHeight').textContent = tree.getHeight();
+        }
+
+        function updateSteps() {
+            const stepsDiv = document.getElementById('stepsOutput');
+            stepsDiv.innerHTML = tree.steps.map(step => `<div class="step-item">${step}</div>`).join('');
+        }
+
+        // Initialize
+        drawTree();
+        document.getElementById('insertInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') insertNode();
+        });
+        document.getElementById('deleteInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') deleteNode();
+        });
+    </script>
+</body>
+</html>
